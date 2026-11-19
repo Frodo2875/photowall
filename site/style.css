@@ -4,10 +4,23 @@
   --ink: #242923;
   --subtle: #505a51;
   --accent: #2e5848;
+  --on-accent: #fff;
   --line: #dcded5;
   --mute: #e9ede4;
   --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   --serif: "Songti SC", "Noto Serif CJK SC", "SimSun", serif;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0e192d;
+  --ink: #e9edf6;
+  --subtle: #b6c5dc;
+  --accent: #adcafa;
+  --on-accent: #11223d;
+  --line: #364b68;
+  --mute: #192943;
+  --atmosphere: radial-gradient(ellipse at 58% -12rem, #21395d, transparent 55rem);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -15,6 +28,9 @@
 body {
   margin: 0;
   background: var(--paper);
+  background-image: var(--atmosphere, none);
+  background-repeat: no-repeat;
+  min-height: 100vh;
   color: var(--ink);
   font: 1rem/1.7 var(--sans);
 }
@@ -40,6 +56,22 @@ nav { display: flex; align-items: center; gap: clamp(.8rem, 3vw, 2rem); }
 nav a { font-size: .875rem; color: var(--subtle); white-space: nowrap; }
 nav a:hover, nav a[aria-current] { color: var(--accent); }
 nav a[aria-current] { text-decoration: underline; text-underline-offset: .45em; }
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--accent);
+  font: 1.25rem/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+.theme-toggle:hover { background: var(--mute); }
+.theme-sun, [data-theme="dark"] .theme-moon { display: none; }
+[data-theme="dark"] .theme-sun { display: inline; }
 .intro { padding: clamp(2.4rem, 6vw, 5rem) 0 clamp(1.8rem, 4vw, 3rem); }
 h1, h2, p { margin: 0; }
 h1, h2 { font-family: var(--serif); }
@@ -90,7 +122,7 @@ h1 {
 .categories button:hover { background: var(--mute); }
 .categories button[aria-pressed="true"], #clear-filters {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 .archive-meta {
   margin-left: auto;
@@ -163,6 +195,7 @@ h1 {
 }
 .about { max-width: 40rem; min-height: 46vh; }
 .about p { max-width: 34rem; }
+.about h2 { margin-top: 2rem; font-size: 1.35rem; }
 .footer {
   border-top: 1px solid var(--line);
   margin-top: clamp(2.25rem, 6vw, 4.25rem);
@@ -195,4 +228,9 @@ h1 {
   .categories button { padding-inline: .45rem; }
   .album-card p { font-size: .875rem; }
   .photo { flex-basis: min(100%, calc(var(--ratio) * 7.5rem)); }
+}
+@media (max-width: 350px) {
+  .masthead-inner { gap: .25rem; }
+  .wordmark { font-size: 1.13rem; }
+  nav { gap: .33rem; }
 }

@@ -49,6 +49,7 @@ def page(title, current, prefix, content, head="", script=""):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f7f3">
   <title>{escape(title)}</title>
+  <script src="{prefix}assets/theme.js"></script>
   <link rel="stylesheet" href="{prefix}assets/style.css">
   {head}
 </head>
@@ -60,6 +61,10 @@ def page(title, current, prefix, content, head="", script=""):
         {nav("照片墙", prefix, "home")}
         {nav("关于", prefix + "about/", "about")}
         {nav("返回博客", BLOG, "blog")}
+        <button type="button" class="theme-toggle" aria-label="深色模式" aria-pressed="false" hidden>
+          <span class="theme-moon" aria-hidden="true">☾</span>
+          <span class="theme-sun" aria-hidden="true">☀</span>
+        </button>
       </nav>
     </div>
   </header>
@@ -151,7 +156,7 @@ def homepage(albums, demo):
     content = f"""
     <section class="intro">
       <h1>照片墙</h1>
-      <p>记录家人、日常和一起走过的地方。</p>
+      <p>记录和家人、朋友在一起的快乐时光。</p>
     </section>
     <section class="archive" aria-label="相册列表">
       <div class="toolbar">
@@ -207,10 +212,12 @@ def about_page(demo):
               if demo else "")
     return page("关于 | Photowall", "about", "../", f"""
     <article class="about">
-      <h1>关于照片墙</h1>
-      <p>这里收录家人的合影、日常随手拍，以及一起走过的地方。照片按拍摄年份和主题整理，方便以后回来翻看。</p>
+      <h1>关于我</h1>
+      <p>你好，我是 Xinghao（Frodo2875），一名从 DUT 到 ECNU 的研究生。我喜欢用 AI 把想法变成可以运行的东西，也对人格心理学感兴趣。</p>
+      <p>我在个人博客里记录 AI Infra 和 Agent 方向的学习、项目实践，也写一些日常的观察与思考。<a href="{BLOG}about/">在博客里认识我</a></p>
+      <h2>关于照片墙</h2>
+      <p>这里想留下我和家人、朋友在一起的快乐时光。一起旅行、聚餐，或是平常见面时随手拍的一张合影，都值得以后再翻出来看看。</p>
       {credit}
-      <p><a href="{BLOG}">返回 Xinghao’s Blog</a></p>
     </article>""")
 
 
