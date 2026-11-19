@@ -9,6 +9,7 @@ const lightbox = new PhotoSwipeLightbox({
   pswpModule: () => import('./vendor/photoswipe.esm.min.js'),
   closeTitle: '关闭（Esc）',
   zoom: false,
+  wheelToZoom: true,
   arrowPrevTitle: '上一张',
   arrowNextTitle: '下一张',
   errorMsg: '无法加载这张照片。',
