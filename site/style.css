@@ -211,42 +211,113 @@ h1 {
   font-size: .875rem;
   line-height: 1.5;
 }
-.about { max-width: 55rem; min-height: 46vh; margin-inline: auto; }
-.about h1 { text-align: center; }
+.about {
+  --profile-surface: #f7faff;
+  --profile-tile: #fff;
+  --profile-border: #dbe6f4;
+  --profile-accent: #1d4ed8;
+  --profile-banner: linear-gradient(115deg, #d5ebfc, #eff6ff 75%);
+}
+:root[data-theme="dark"] .about {
+  --profile-surface: #142033;
+  --profile-tile: #1d2b42;
+  --profile-border: #32435e;
+  --profile-accent: #a9d1ff;
+  --profile-banner: linear-gradient(115deg, #244870, #1a2941 80%);
+}
+.about h1 {
+  margin-bottom: 1.5rem;
+  font: 800 clamp(1.85rem, 4vw, 2.25rem)/1.2 var(--sans);
+  letter-spacing: normal;
+}
 .profile-card {
-  --card-start: #dcebf5;
-  --card-end: #f0f4f5;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 2rem clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 2rem);
+  border: 1px solid var(--profile-border);
+  border-radius: 1.25rem;
+  background: var(--profile-surface);
+}
+.profile-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto;
+  height: 7rem;
+  background: var(--profile-banner);
+}
+.profile-identity {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: clamp(.85rem, 3vw, 1.75rem);
-  margin-top: 1.25rem;
-  padding: clamp(1rem, 4vw, 2rem);
-  border: 1px solid var(--line);
-  border-radius: 1rem;
-  background: linear-gradient(112deg, var(--card-start), var(--card-end));
+  gap: clamp(1rem, 3vw, 1.5rem);
 }
-:root[data-theme="dark"] .profile-card {
-  --card-start: #233b60;
-  --card-end: #17253d;
-}
-.profile-card img {
+.profile-identity img {
   flex: none;
-  width: clamp(4.5rem, 13vw, 7rem);
-  height: auto;
-  aspect-ratio: 1;
-  border: .2rem solid var(--paper);
+  width: 7rem;
+  height: 7rem;
+  border: 4px solid var(--profile-surface);
   border-radius: 50%;
-  box-shadow: 0 .35rem .9rem rgb(14 25 45 / 18%);
+  object-fit: cover;
+  box-shadow: 0 6px 18px rgb(15 35 65 / .16);
 }
-.profile-card h2 {
-  font: 750 clamp(1.15rem, 3vw, 1.9rem)/1.2 var(--sans);
+.profile-identity h2 {
+  font: 800 1.875rem/1.2 var(--sans);
   overflow-wrap: anywhere;
 }
-.profile-card p { margin-top: .4rem; }
-.about-copy { max-width: 36rem; margin-inline: auto; padding-top: 1.65rem; }
-.about-copy h2 { font-size: 1.35rem; }
-.about-copy h2:not(:first-child) { margin-top: 2rem; }
+.profile-identity p { margin-top: .5rem; }
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(.45rem, 2vw, .9rem);
+  margin: 1.5rem 0 0;
+}
+.profile-stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: .25rem;
+  padding: .8rem .3rem;
+  text-align: center;
+  border: 1px solid var(--profile-border);
+  border-radius: .85rem;
+  background: var(--profile-tile);
+}
+.profile-stats dt { color: var(--subtle); font-size: .875rem; }
+.profile-stats dd {
+  margin: 0;
+  color: var(--profile-accent);
+  font-size: 1.5rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.about-copy {
+  max-width: 48rem;
+  margin: clamp(1.25rem, 3vw, 2.5rem) auto 0;
+  padding: clamp(1.125rem, 4vw, 2.75rem);
+  border: 1px solid var(--profile-border);
+  border-radius: 1.25rem;
+  background: var(--profile-surface);
+  color: var(--subtle);
+  font-size: clamp(1rem, .94rem + .3vw, 1.125rem);
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.about-copy > :where(p, ul, blockquote) { margin-block: .95em; }
+.about-copy > :first-child { margin-top: 0; }
+.about-copy > :last-child { margin-bottom: 0; }
+.about-copy :is(h2, h3, strong) { color: var(--ink); }
+.about-copy h2 { margin: 1.65em 0 .5em; font: 750 1.35rem/1.4 var(--sans); }
+.about-copy h3 { margin: 1em 0 .35em; font-size: 1.1em; }
+.about-copy ul { padding-inline-start: 1.35em; }
+.about-copy li { margin-block: .32em; }
+.about-copy blockquote {
+  margin-inline: 0;
+  padding-inline-start: 1rem;
+  border-inline-start: 4px solid var(--profile-accent);
+  font-style: italic;
+}
+.about-copy blockquote p { margin: 0; }
 .footer {
   border-top: 1px solid var(--line);
   margin-top: clamp(2.25rem, 6vw, 4.25rem);
@@ -270,6 +341,11 @@ h1 {
   .album-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .photo { flex-basis: min(100%, calc(var(--ratio) * 10rem)); }
 }
+@media (max-width: 560px) {
+  .profile-identity { flex-direction: column; text-align: center; }
+  .about-copy { line-height: 1.75; }
+  .about-copy h2 { margin-top: 1.35em; }
+}
 @media (max-width: 500px) {
   .masthead-inner { min-height: 3.7rem; gap: .5rem; }
   .wordmark { font-size: 1.35rem; }
@@ -279,7 +355,6 @@ h1 {
   .categories button { padding-inline: .45rem; }
   .album-card p { font-size: .875rem; }
   .photo { flex-basis: min(100%, calc(var(--ratio) * 7.5rem)); }
-  .profile-card { flex-direction: column; text-align: center; }
 }
 @media (max-width: 350px) {
   .masthead-inner { gap: .25rem; }

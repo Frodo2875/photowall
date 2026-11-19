@@ -4,7 +4,7 @@ import json
 import re
 import shutil
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from hashlib import sha256
 from html import escape
 from pathlib import Path
@@ -15,6 +15,7 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parent
 STYLE_VERSION = sha256((ROOT / "site/style.css").read_bytes()).hexdigest()[:12]
 BLOG = "https://frodo2875.github.io/xinghao.github.io/"
+PHOTOWALL_LAUNCHED = date(2026, 11, 19)
 CATEGORIES = {"travel": "旅行", "daily": "日常", "people": "人物", "events": "活动"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
@@ -209,28 +210,89 @@ def album_page(album, demo):
                 script='<script type="module" src="../../assets/gallery.js"></script>')
 
 
-def about_page(demo):
+def about_page(albums, demo):
+    photo_count = sum(len(album.photos) for album in albums)
+    category_count = len({album.category for album in albums})
+    today = datetime.now(timezone(timedelta(hours=8))).date()
+    days = max(0, (today - PHOTOWALL_LAUNCHED).days)
     credit = ('<p>当前展示的是示例相册，照片来自 <a href="https://unsplash.com/">Unsplash</a>。</p>'
               if demo else "")
     return page("关于 | Photowall", "about", "../", f"""
     <article class="about">
       <h1>关于</h1>
       <section class="profile-card" aria-labelledby="profile-name">
-        <img src="../assets/profile.webp" alt="Frodo2875 的头像" width="320" height="320" decoding="async">
-        <div>
-          <h2 id="profile-name">Frodo2875</h2>
-          <p>记录成长的一切，享受世界给予我的一切</p>
+        <div class="profile-identity">
+          <img src="../assets/profile.webp" alt="Frodo2875 的头像" width="320" height="320" decoding="async">
+          <div>
+            <h2 id="profile-name">Frodo2875</h2>
+            <p>记录成长的一切，享受世界给予我的一切</p>
+          </div>
         </div>
+        <dl class="profile-stats">
+          <div><dt>张照片</dt><dd>{photo_count}</dd></div>
+          <div><dt>个分类</dt><dd>{category_count}</dd></div>
+          <div><dt>天陪伴</dt><dd data-companion-since="{PHOTOWALL_LAUNCHED.isoformat()}">{days}</dd></div>
+        </dl>
       </section>
       <div class="about-copy">
+        <p>你好，我是 <strong>Xinghao</strong>，欢迎来到我的照片墙。</p>
+        <blockquote><p><strong>研究甥 · AI Coding 重度患者</strong></p></blockquote>
+        <p>我的个人博客用来记录技术学习、项目实践，以及日常的观察与思考。把问题写清楚，把过程留下来，也让下一次探索有迹可循。</p>
+
         <h2>关于我</h2>
-        <p>你好，我是 Xinghao（Frodo2875），一名从 DUT 到 ECNU 的研究生。我喜欢用 AI 把想法变成可以运行的东西，也对人格心理学感兴趣。</p>
-        <p>我在个人博客里记录 AI Infra 和 Agent 方向的学习、项目实践，也写一些日常的观察与思考。<a href="{BLOG}about/">在博客里认识我</a></p>
+        <ul>
+          <li><strong>学习轨迹</strong>：DUTer → ECNUer。</li>
+          <li><strong>技术兴趣</strong>：AI Infra → Agent。</li>
+          <li><strong>人格标签</strong>：ENFJ 🌞，对人格心理学充满好奇。</li>
+          <li><strong>另一面</strong>：人际关系针扎者，关注人与人之间的理解与连接。</li>
+        </ul>
+        <p>作为一名 <strong>AI Coding 重度患者</strong>，我喜欢借助 AI 把想法变成可以运行的东西，也记录过程中的尝试、问题与思考。</p>
+
+        <h2>你可以在博客里找到</h2>
+        <ul>
+          <li><strong>技术笔记</strong>：概念梳理、代码示例与问题排查。</li>
+          <li><strong>学习记录</strong>：数学推导、课程笔记与阅读整理。</li>
+          <li><strong>项目实践</strong>：从一个想法到具体实现的过程。</li>
+          <li><strong>日常思考</strong>：关于学习、人格心理学，以及人与人之间的相处。</li>
+        </ul>
+        <p><a href="{BLOG}about/">在博客里认识我</a></p>
+
+        <h2>爱好</h2>
+        <h3>运动娱乐</h3>
+        <ul>
+          <li><strong>乒乓球</strong>：用银河 U2。</li>
+          <li><strong>篮球</strong>：刚开始学，喜欢投篮。</li>
+          <li><strong>麻将</strong>：喜欢打川麻。</li>
+        </ul>
+        <h3>影视</h3>
+        <ul>
+          <li><strong>动漫</strong>：《斗破苍穹》《神印王座》《吞噬星空》。</li>
+          <li><strong>电影</strong>：《海蒂和爷爷》《寻梦环游记》《头脑特工队》系列。</li>
+          <li><strong>综艺</strong>：《喜剧大赛》系列，还有脱口秀和音乐综艺。</li>
+          <li><strong>电视剧</strong>：《海市蜃楼》等悬疑剧。</li>
+        </ul>
+        <h3>其他</h3>
+        <ul>
+          <li>爱猫</li>
+          <li>看直播：飞车、世界杯、英雄联盟 S 赛</li>
+          <li>玩魔方</li>
+          <li>散步</li>
+          <li>听音乐、K 歌</li>
+          <li>德华牢舅假期带娃</li>
+        </ul>
+
+        <h2>找到我</h2>
+        <ul>
+          <li><strong>GitHub</strong>：<a href="https://github.com/Frodo2875">Frodo2875</a></li>
+          <li><strong>小红书</strong>：6025032171</li>
+        </ul>
+
         <h2>关于照片墙</h2>
         <p>这里想留下我和家人、朋友在一起的快乐时光。一起旅行、聚餐，或是平常见面时随手拍的一张合影，都值得以后再翻出来看看。</p>
+        <p>照片和分类按当前展示的相册统计，陪伴天数从照片墙于 2026 年 11 月 19 日上线起算。</p>
         {credit}
       </div>
-    </article>""")
+    </article>""", script='<script defer src="../assets/about-companion.js"></script>')
 
 
 def write_page(destination, html):
@@ -256,7 +318,7 @@ def main():
             key=lambda album: (album.date, album.slug), reverse=True,
         )
         write_page(output / "index.html", homepage(albums, demo))
-        write_page(output / "about/index.html", about_page(demo))
+        write_page(output / "about/index.html", about_page(albums, demo))
         for album in albums:
             write_page(output / "albums" / album.slug / "index.html", album_page(album, demo))
         if dist.exists():
