@@ -5,6 +5,7 @@ import re
 import shutil
 from dataclasses import dataclass
 from datetime import date
+from hashlib import sha256
 from html import escape
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -12,6 +13,7 @@ from tempfile import TemporaryDirectory
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent
+STYLE_VERSION = sha256((ROOT / "site/style.css").read_bytes()).hexdigest()[:12]
 BLOG = "https://frodo2875.github.io/xinghao.github.io/"
 CATEGORIES = {"travel": "旅行", "daily": "日常", "people": "人物", "events": "活动"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
@@ -50,7 +52,7 @@ def page(title, current, prefix, content, head="", script=""):
   <meta name="theme-color" content="#f8f7f3">
   <title>{escape(title)}</title>
   <script src="{prefix}assets/theme.js"></script>
-  <link rel="stylesheet" href="{prefix}assets/style.css">
+  <link rel="stylesheet" href="{prefix}assets/style.css?v={STYLE_VERSION}">
   {head}
 </head>
 <body>
