@@ -212,30 +212,18 @@ h1 {
   line-height: 1.5;
 }
 .about {
-  --profile-surface: #f7faff;
-  --profile-tile: #fff;
-  --profile-border: #dbe6f4;
-  --profile-accent: #1d4ed8;
-  --profile-banner: linear-gradient(115deg, #d5ebfc, #eff6ff 75%);
-}
-:root[data-theme="dark"] .about {
-  --profile-surface: #142033;
-  --profile-tile: #1d2b42;
-  --profile-border: #32435e;
-  --profile-accent: #a9d1ff;
-  --profile-banner: linear-gradient(115deg, #244870, #1a2941 80%);
+  --profile-surface: color-mix(in srgb, var(--mute) 55%, var(--paper));
+  --profile-banner: linear-gradient(115deg, var(--mute), var(--paper) 85%);
 }
 .about h1 {
   margin-bottom: 1.5rem;
-  font: 800 clamp(1.85rem, 4vw, 2.25rem)/1.2 var(--sans);
-  letter-spacing: normal;
 }
 .profile-card {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   padding: 2rem clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 2rem);
-  border: 1px solid var(--profile-border);
+  border: 1px solid var(--line);
   border-radius: 1.25rem;
   background: var(--profile-surface);
 }
@@ -262,7 +250,8 @@ h1 {
   box-shadow: 0 6px 18px rgb(15 35 65 / .16);
 }
 .profile-identity h2 {
-  font: 800 1.875rem/1.2 var(--sans);
+  font-size: 1.875rem;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 .profile-identity p { margin-top: .5rem; }
@@ -278,14 +267,14 @@ h1 {
   gap: .25rem;
   padding: .8rem .3rem;
   text-align: center;
-  border: 1px solid var(--profile-border);
+  border: 1px solid var(--line);
   border-radius: .85rem;
-  background: var(--profile-tile);
+  background: var(--paper);
 }
 .profile-stats dt { color: var(--subtle); font-size: .875rem; }
 .profile-stats dd {
   margin: 0;
-  color: var(--profile-accent);
+  color: var(--accent);
   font-size: 1.5rem;
   font-weight: 750;
   font-variant-numeric: tabular-nums;
@@ -295,7 +284,7 @@ h1 {
   max-width: 48rem;
   margin: clamp(1.25rem, 3vw, 2.5rem) auto 0;
   padding: clamp(1.125rem, 4vw, 2.75rem);
-  border: 1px solid var(--profile-border);
+  border: 1px solid var(--line);
   border-radius: 1.25rem;
   background: var(--profile-surface);
   color: var(--subtle);
@@ -307,14 +296,14 @@ h1 {
 .about-copy > :first-child { margin-top: 0; }
 .about-copy > :last-child { margin-bottom: 0; }
 .about-copy :is(h2, h3, strong) { color: var(--ink); }
-.about-copy h2 { margin: 1.65em 0 .5em; font: 750 1.35rem/1.4 var(--sans); }
+.about-copy h2 { margin: 1.65em 0 .5em; font-size: 1.35rem; line-height: 1.4; }
 .about-copy h3 { margin: 1em 0 .35em; font-size: 1.1em; }
 .about-copy ul { padding-inline-start: 1.35em; }
 .about-copy li { margin-block: .32em; }
 .about-copy blockquote {
   margin-inline: 0;
   padding-inline-start: 1rem;
-  border-inline-start: 4px solid var(--profile-accent);
+  border-inline-start: 4px solid var(--accent);
   font-style: italic;
 }
 .about-copy blockquote p { margin: 0; }
