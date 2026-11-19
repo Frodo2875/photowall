@@ -211,12 +211,14 @@ h1 {
   font-size: .875rem;
   line-height: 1.5;
 }
-.about { max-width: 55rem; min-height: 46vh; }
+.about { max-width: 55rem; min-height: 46vh; margin-inline: auto; }
+.about h1 { text-align: center; }
 .profile-card {
   --card-start: #dcebf5;
   --card-end: #f0f4f5;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: clamp(.85rem, 3vw, 1.75rem);
   margin-top: 1.25rem;
   padding: clamp(1rem, 4vw, 2rem);
@@ -242,8 +244,7 @@ h1 {
   overflow-wrap: anywhere;
 }
 .profile-card p { margin-top: .4rem; }
-.about-copy { max-width: 40rem; padding-top: 1.65rem; }
-.about-copy p { max-width: 34rem; }
+.about-copy { max-width: 36rem; margin-inline: auto; padding-top: 1.65rem; }
 .about-copy h2 { font-size: 1.35rem; }
 .about-copy h2:not(:first-child) { margin-top: 2rem; }
 .footer {
@@ -278,6 +279,7 @@ h1 {
   .categories button { padding-inline: .45rem; }
   .album-card p { font-size: .875rem; }
   .photo { flex-basis: min(100%, calc(var(--ratio) * 7.5rem)); }
+  .profile-card { flex-direction: column; text-align: center; }
 }
 @media (max-width: 350px) {
   .masthead-inner { gap: .25rem; }
