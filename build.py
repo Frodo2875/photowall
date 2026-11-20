@@ -73,6 +73,10 @@ def page(title, current, prefix, content, head="", script=""):
   </header>
   <main class="shell">{content}</main>
   <footer class="shell footer"><span>Photowall</span><a href="{BLOG}">Xinghao’s Blog</a></footer>
+  <button type="button" class="photowall-pet" aria-label="蓝鲸少女，点击互动，可拖动或按方向键移动" data-pose="rest" draggable="false" hidden>
+    <span class="pet-sprite" aria-hidden="true"></span>
+  </button>
+  <script type="module" src="{prefix}assets/pet.js"></script>
   {script}
 </body>
 </html>

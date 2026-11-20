@@ -307,6 +307,57 @@ h1 {
   font-style: italic;
 }
 .about-copy blockquote p { margin: 0; }
+.photowall-pet {
+  position: fixed;
+  z-index: 20;
+  width: clamp(4.75rem, 11vw, 7rem);
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 0;
+  border-radius: .75rem;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.photowall-pet.is-dragging { cursor: grabbing; }
+body:has(.pswp--open) .photowall-pet { visibility: hidden; }
+.pet-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("pet-poses.webp") 0 0 / 600% 100% no-repeat;
+  pointer-events: none;
+  transform-origin: 50% 92%;
+  filter: drop-shadow(0 3px 4px rgb(14 25 45 / 26%));
+}
+[data-pose="wave"] .pet-sprite { background-position-x: 20%; animation: pet-wave .62s ease-in-out 2; }
+[data-pose="cheer"] .pet-sprite { background-position-x: 40%; animation: pet-hop .52s ease-in-out 2; }
+[data-pose="heart"] .pet-sprite { background-position-x: 60%; animation: pet-heart .65s ease 2; }
+[data-pose="think"] .pet-sprite { background-position-x: 80%; animation: pet-think 2.1s ease-in-out; }
+[data-pose="nap"] .pet-sprite { background-position-x: 100%; animation: pet-nap 1.1s ease-in-out 3; }
+@keyframes pet-wave {
+  25% { transform: rotate(-7deg); }
+  75% { transform: rotate(5deg); }
+}
+@keyframes pet-hop {
+  26% { transform: translateY(-15%) scale(.98, 1.04); }
+  63% { transform: scale(1.06, .94); }
+}
+@keyframes pet-heart {
+  50% { transform: scale(1.075); }
+}
+@keyframes pet-think {
+  24%, 75% { transform: rotate(-5deg); }
+  52% { transform: rotate(4deg); }
+}
+@keyframes pet-nap {
+  50% { transform: scale(1.025, .965); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .photowall-pet[data-pose] .pet-sprite { animation: none; }
+}
 .footer {
   border-top: 1px solid var(--line);
   margin-top: clamp(2.25rem, 6vw, 4.25rem);
