@@ -1,158 +1,135 @@
+import { browsingLine, clickLines, idleLine, rapidClickLine } from './pet-lines.js';
+
 const pet = document.querySelector('.photowall-pet');
-const storageKey = 'photowall-pet-position';
-const clickPoses = ['wave', 'cheer', 'heart'];
-const idlePoses = ['think', 'nap'];
-const poseDuration = { wave: 1400, cheer: 1150, heart: 1450, think: 2200, nap: 3500 };
-const edge = 12;
-const limit = (value, max) => Math.min(max, Math.max(0, value));
+const button = pet.querySelector('.pet-button');
+const dialogue = pet.querySelector('.pet-dialogue');
+const text = pet.querySelector('.pet-dialogue-text');
+const announcement = pet.querySelector('.pet-announcement');
+const dismiss = pet.querySelector('.pet-dismiss');
+const home = pet.parentElement;
+const idleDelay = 30_000;
+const photoWindow = 45_000;
+const photoCooldown = 60_000;
+const historyKey = 'photowall-pet-photo-views';
 
-let position = { x: 1, y: 1 };
-try {
-  const saved = JSON.parse(localStorage.getItem(storageKey));
-  if (Number.isFinite(saved?.x) && Number.isFinite(saved?.y)) {
-    position = { x: limit(saved.x, 1), y: limit(saved.y, 1) };
-  }
-} catch {
-  // The pet remains draggable when browser storage is unavailable.
-}
-
-function travelBounds() {
-  return {
-    x: Math.max(0, document.documentElement.clientWidth - pet.offsetWidth - edge * 2),
-    y: Math.max(0, window.innerHeight - pet.offsetHeight - edge * 2),
-  };
-}
-
-function renderPosition() {
-  const bounds = travelBounds();
-  pet.style.left = `${edge + bounds.x * position.x}px`;
-  pet.style.top = `${edge + bounds.y * position.y}px`;
-}
-
-function moveTo(x, y) {
-  const bounds = travelBounds();
-  if (bounds.x) position.x = limit(x - edge, bounds.x) / bounds.x;
-  if (bounds.y) position.y = limit(y - edge, bounds.y) / bounds.y;
-  renderPosition();
-}
-
-function savePosition() {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(position));
-  } catch {
-    // The current page keeps the new position.
-  }
-}
-
-let idleTimer;
 let poseTimer;
-let lastClickPose;
-let drag;
-let suppressClick = false;
+let dialogueTimer;
+let idleTimer;
+let followUp;
+let clickBag = [];
+let lastLine;
+let lastTap = -Infinity;
+let taps = 0;
+let photos = [];
+let lastBrowse = 0;
 
-function rest() {
+try {
+  const history = JSON.parse(sessionStorage.getItem(historyKey));
+  if (Array.isArray(history?.photos)) photos = history.photos;
+  if (Number.isFinite(history?.lastBrowse)) lastBrowse = history.lastBrowse;
+} catch {
+  // Counting still works within the current page if storage is blocked.
+}
+
+function resetPose() {
   clearTimeout(poseTimer);
   pet.dataset.pose = 'rest';
 }
 
-function react(pool, lastPose) {
-  const choices = pool.filter((pose) => pose !== lastPose);
-  const pose = choices[Math.floor(Math.random() * choices.length)];
+function hideDialogue() {
+  clearTimeout(dialogueTimer);
+  if (document.activeElement === dismiss) {
+    const focusTarget = pet.parentElement === home ? button : pet.parentElement;
+    focusTarget.focus({ preventScroll: true });
+  }
+  dialogue.hidden = true;
+  announcement.textContent = '';
+  delete pet.dataset.speaking;
+  followUp = undefined;
+  resetPose();
+}
+
+function speak(line) {
   clearTimeout(poseTimer);
-  pet.dataset.pose = pose;
-  poseTimer = setTimeout(rest, poseDuration[pose]);
-  return pose;
+  clearTimeout(dialogueTimer);
+  pet.dataset.pose = line.pose;
+  pet.dataset.speaking = 'true';
+  followUp = line.followUp;
+  text.textContent = line.text;
+  dialogue.hidden = false;
+  announcement.textContent = line.text;
+  poseTimer = setTimeout(resetPose, line.pose === 'doze' ? 2800 : 1550);
+  dialogueTimer = setTimeout(hideDialogue, Math.max(7000, line.text.length * 145));
+}
+
+function takeClickLine() {
+  if (!clickBag.length) clickBag = [...clickLines];
+  const choices = clickBag.length > 1 ? clickBag.filter((line) => line !== lastLine) : clickBag;
+  const line = choices[Math.floor(Math.random() * choices.length)];
+  clickBag = clickBag.filter((candidate) => candidate !== line);
+  lastLine = line;
+  return line;
 }
 
 function scheduleIdle() {
   clearTimeout(idleTimer);
-  if (document.hidden) return;
-  idleTimer = setTimeout(() => {
-    if (!drag && !document.querySelector('.pswp--open')) {
-      react(idlePoses);
-    }
-    scheduleIdle();
-  }, 60_000 + Math.floor(Math.random() * 60_001));
-}
-
-pet.addEventListener('pointerdown', (event) => {
-  if (event.button !== 0 || drag) return;
-  event.preventDefault();
-  if (event.pointerType === 'mouse') pet.focus({ preventScroll: true });
-  const rect = pet.getBoundingClientRect();
-  drag = {
-    id: event.pointerId,
-    x: event.clientX,
-    y: event.clientY,
-    left: rect.left,
-    top: rect.top,
-    moved: false,
-  };
-  suppressClick = false;
-  clearTimeout(idleTimer);
-  pet.setPointerCapture(event.pointerId);
-});
-pet.addEventListener('dragstart', (event) => event.preventDefault());
-
-function updateDrag(event) {
-  if (event.pointerId !== drag?.id) return;
-  const dx = event.clientX - drag.x;
-  const dy = event.clientY - drag.y;
-  if (!drag.moved && Math.hypot(dx, dy) < 6) return;
-  if (!drag.moved) {
-    drag.moved = true;
-    pet.classList.add('is-dragging');
-    rest();
+  if (!document.hidden && !pet.hidden) {
+    idleTimer = setTimeout(() => speak(idleLine), idleDelay);
   }
-  moveTo(drag.left + dx, drag.top + dy);
 }
 
-pet.addEventListener('pointermove', updateDrag);
-
-function finishDrag(event) {
-  if (event.pointerId !== drag?.id) return;
-  if (event.type === 'pointerup') updateDrag(event);
-  suppressClick = drag.moved;
-  if (drag.moved) savePosition();
-  drag = undefined;
-  pet.classList.remove('is-dragging');
-  scheduleIdle();
-}
-
-for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
-  pet.addEventListener(type, finishDrag);
-}
-
-pet.addEventListener('click', (event) => {
-  if (suppressClick && event.detail > 0) return;
-  lastClickPose = react(clickPoses, lastClickPose);
+button.addEventListener('click', () => {
+  const now = performance.now();
+  taps = now - lastTap <= 2000 ? taps + 1 : 1;
+  lastTap = now;
+  if (taps === 5) {
+    taps = 0;
+    speak(rapidClickLine);
+  } else {
+    speak(followUp ?? takeClickLine());
+  }
   scheduleIdle();
 });
 
-const directions = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
-pet.addEventListener('keydown', (event) => {
-  const direction = directions[event.key];
-  if (!direction) return;
-  event.preventDefault();
-  const rect = pet.getBoundingClientRect();
-  moveTo(rect.left + direction[0] * 16, rect.top + direction[1] * 16);
-  savePosition();
+dismiss.addEventListener('click', () => {
+  hideDialogue();
   scheduleIdle();
 });
 
-window.addEventListener('resize', renderPosition);
+for (const type of ['pointerdown', 'pointermove', 'keydown', 'scroll', 'wheel']) {
+  window.addEventListener(type, scheduleIdle, { passive: true, capture: true });
+}
 window.addEventListener('pageshow', scheduleIdle);
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) rest();
+document.addEventListener('visibilitychange', scheduleIdle);
+
+document.addEventListener('photowall:viewer-open', (event) => event.detail.append(pet));
+document.addEventListener('photowall:viewer-close', () => home.append(pet));
+document.addEventListener('photowall:photo-viewed', ({ detail: photo }) => {
+  const now = Date.now();
+  photos = photos.filter((entry) => now - entry.time <= photoWindow && entry.photo !== photo);
+  photos.push({ photo, time: now });
+  if (photos.length >= 3 && now - lastBrowse >= photoCooldown && !document.hidden) {
+    lastBrowse = now;
+    photos = [];
+    speak(browsingLine);
+  }
+  try {
+    sessionStorage.setItem(historyKey, JSON.stringify({ photos, lastBrowse }));
+  } catch {
+    // The current page keeps its viewing history.
+  }
   scheduleIdle();
 });
 
-const sprite = new Image();
-sprite.src = new URL('./pet-poses.webp', import.meta.url);
-sprite.decode().then(() => {
+const preload = (name) => {
+  const image = new Image();
+  image.src = new URL(name, import.meta.url);
+  return image.decode();
+};
+
+Promise.all([preload('./pet-poses.webp'), preload('./pet-scenes.webp')]).then(() => {
   pet.hidden = false;
-  renderPosition();
   scheduleIdle();
 }).catch(() => {
-  // Leave the control hidden if its artwork cannot load.
+  // Leave the companion hidden if its artwork cannot load.
 });

@@ -310,19 +310,73 @@ h1 {
 .photowall-pet {
   position: fixed;
   z-index: 20;
-  width: clamp(4.75rem, 11vw, 7rem);
+  right: max(.75rem, env(safe-area-inset-right));
+  bottom: max(.75rem, env(safe-area-inset-bottom));
+  width: min(clamp(9rem, 12vw, 13.25rem), 31dvh);
+  pointer-events: none;
+}
+.pet-button {
+  position: relative;
+  display: block;
+  width: 100%;
   aspect-ratio: 3 / 4;
   padding: 0;
   border: 0;
   border-radius: .75rem;
   background: transparent;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  pointer-events: auto;
 }
-.photowall-pet.is-dragging { cursor: grabbing; }
-body:has(.pswp--open) .photowall-pet { visibility: hidden; }
+.pet-button, .pet-dismiss { -webkit-tap-highlight-color: transparent; }
+.pswp .photowall-pet {
+  position: absolute;
+  bottom: max(3.75rem, calc(env(safe-area-inset-bottom) + 3rem));
+  width: min(clamp(6rem, 10vw, 9rem), 26dvh);
+}
+.pswp .photowall-pet:not([data-speaking]) { visibility: hidden; }
+.pet-dialogue {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + .4rem);
+  width: min(23rem, calc(100vw - 1.5rem - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  max-height: 42dvh;
+  overflow: auto;
+  padding: .85rem 3.15rem .85rem 1rem;
+  border: 2px solid #546681;
+  border-radius: .8rem;
+  background: #fff;
+  color: #162239;
+  box-shadow: 0 .3rem 1.2rem rgb(0 0 0 / 19%);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  pointer-events: auto;
+}
+[data-theme="dark"] .pet-dialogue {
+  background: #13243c;
+  color: #f1f5ff;
+  border-color: #a0b6d9;
+}
+.pet-dismiss {
+  position: absolute;
+  top: .1rem;
+  right: .1rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: .5rem;
+  background: transparent;
+  color: inherit;
+  font-size: 1.55rem;
+  cursor: pointer;
+}
+.pet-dismiss:hover { background: var(--mute); }
+.pet-dismiss:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+.pswp .pet-button:focus-visible { outline-color: #fff; outline-offset: -2px; }
 .pet-sprite {
   display: block;
   width: 100%;
@@ -335,8 +389,52 @@ body:has(.pswp--open) .photowall-pet { visibility: hidden; }
 [data-pose="wave"] .pet-sprite { background-position-x: 20%; animation: pet-wave .62s ease-in-out 2; }
 [data-pose="cheer"] .pet-sprite { background-position-x: 40%; animation: pet-hop .52s ease-in-out 2; }
 [data-pose="heart"] .pet-sprite { background-position-x: 60%; animation: pet-heart .65s ease 2; }
-[data-pose="think"] .pet-sprite { background-position-x: 80%; animation: pet-think 2.1s ease-in-out; }
-[data-pose="nap"] .pet-sprite { background-position-x: 100%; animation: pet-nap 1.1s ease-in-out 3; }
+[data-pose="think"] .pet-sprite { background-position-x: 80%; animation: pet-think 1.45s ease-in-out; }
+[data-pose="detective"] .pet-sprite,
+[data-pose="doze"] .pet-sprite,
+[data-pose="trophy"] .pet-sprite {
+  background-image: url("pet-scenes.webp");
+  background-size: 300% 100%;
+}
+[data-pose="detective"] .pet-sprite { animation: pet-peek .72s ease-out; }
+[data-pose="doze"] .pet-sprite { background-position-x: 50%; animation: pet-nap 1.3s ease-in-out 2; }
+[data-pose="trophy"] .pet-sprite { background-position-x: 100%; animation: pet-hop .65s ease-in-out 2; }
+.pet-bubbles { display: none; pointer-events: none; }
+[data-pose="doze"] .pet-bubbles { display: block; }
+.pet-bubbles i, .pet-bubbles b { position: absolute; opacity: 0; }
+.pet-bubbles i {
+  bottom: 44%;
+  left: 32%;
+  width: .75rem;
+  aspect-ratio: 1;
+  border: 1px solid #45749e;
+  border-radius: 50%;
+  background: #bddcfa;
+  animation: pet-bubble 1s ease-out;
+}
+.pet-bubbles i:nth-child(2) { left: 45%; animation-delay: .35s; }
+.pet-bubbles i:nth-child(3) { left: 54%; animation-delay: .7s; }
+.pet-bubbles b {
+  right: 17%;
+  top: 28%;
+  color: #fff;
+  background: #173956;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  font: 800 1rem/1.5rem var(--sans);
+  animation: pet-notice .9s 1.65s both;
+}
+@keyframes pet-bubble {
+  25% { opacity: 1; }
+  to { transform: translateY(-2.1rem) scale(1.35); }
+}
+@keyframes pet-notice {
+  15%, 85% { opacity: 1; }
+}
+@keyframes pet-peek {
+  from { transform: translateY(23%); opacity: 0; }
+}
 @keyframes pet-wave {
   25% { transform: rotate(-7deg); }
   75% { transform: rotate(5deg); }
@@ -356,7 +454,11 @@ body:has(.pswp--open) .photowall-pet { visibility: hidden; }
   50% { transform: scale(1.025, .965); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .photowall-pet[data-pose] .pet-sprite { animation: none; }
+  .photowall-pet[data-pose] .pet-sprite, .pet-bubbles :is(i, b) { animation: none; }
+  .pet-bubbles b { opacity: 1; }
+}
+@media (max-width: 600px) {
+  .photowall-pet { width: min(clamp(6.5rem, 27vw, 8rem), 30dvh); }
 }
 .footer {
   border-top: 1px solid var(--line);

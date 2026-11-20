@@ -23,6 +23,14 @@ const lightbox = new PhotoSwipeLightbox({
 
 lightbox.on('uiRegister', () => {
   const viewer = lightbox.pswp;
+  viewer.on('openingAnimationEnd', () => {
+    document.dispatchEvent(new CustomEvent('photowall:viewer-open', { detail: viewer.element }));
+  });
+  viewer.on('close', () => document.dispatchEvent(new Event('photowall:viewer-close')));
+  viewer.on('change', () => {
+    const photo = viewer.currSlide?.data.element?.href;
+    if (photo) document.dispatchEvent(new CustomEvent('photowall:photo-viewed', { detail: photo }));
+  });
 
   function addZoomButton(name, label, symbol, scale, order) {
     function targetZoom() {

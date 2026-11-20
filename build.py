@@ -14,6 +14,8 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent
 STYLE_VERSION = sha256((ROOT / "site/style.css").read_bytes()).hexdigest()[:12]
+PET_VERSION = sha256((ROOT / "site/pet.js").read_bytes()).hexdigest()[:12]
+GALLERY_VERSION = sha256((ROOT / "site/gallery.js").read_bytes()).hexdigest()[:12]
 BLOG = "https://frodo2875.github.io/xinghao.github.io/"
 PHOTOWALL_LAUNCHED = date(2026, 11, 19)
 CATEGORIES = {"travel": "旅行", "daily": "日常", "people": "人物", "events": "活动"}
@@ -73,10 +75,18 @@ def page(title, current, prefix, content, head="", script=""):
   </header>
   <main class="shell">{content}</main>
   <footer class="shell footer"><span>Photowall</span><a href="{BLOG}">Xinghao’s Blog</a></footer>
-  <button type="button" class="photowall-pet" aria-label="蓝鲸少女，点击互动，可拖动或按方向键移动" data-pose="rest" draggable="false" hidden>
-    <span class="pet-sprite" aria-hidden="true"></span>
-  </button>
-  <script type="module" src="{prefix}assets/pet.js"></script>
+  <div class="photowall-pet" data-pose="rest" hidden>
+    <div class="pet-dialogue" hidden>
+      <p class="pet-dialogue-text"></p>
+      <button type="button" class="pet-dismiss" aria-label="关闭蓝鲸少女的对白">×</button>
+    </div>
+    <span class="sr-only pet-announcement" role="status" aria-atomic="true"></span>
+    <button type="button" class="pet-button" aria-label="蓝鲸少女，点击互动">
+      <span class="pet-sprite" aria-hidden="true"></span>
+      <span class="pet-bubbles" aria-hidden="true"><i></i><i></i><i></i><b>!</b></span>
+    </button>
+  </div>
+  <script type="module" src="{prefix}assets/pet.js?v={PET_VERSION}"></script>
   {script}
 </body>
 </html>
@@ -211,7 +221,7 @@ def album_page(album, demo):
     <div class="photos">{"".join(items)}</div>"""
     return page(f"{album.title} | Photowall", "home", "../../", content,
                 head='<link rel="stylesheet" href="../../assets/vendor/photoswipe.css">',
-                script='<script type="module" src="../../assets/gallery.js"></script>')
+                script=f'<script type="module" src="../../assets/gallery.js?v={GALLERY_VERSION}"></script>')
 
 
 def about_page(albums, demo):
