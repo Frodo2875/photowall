@@ -1,4 +1,5 @@
 import { browsingLine, clickLines, idleLine, rapidClickLine } from './pet-lines.js';
+import { petMotion, settledFrame } from './pet-motion.js';
 
 const pet = document.querySelector('.photowall-pet');
 const button = pet.querySelector('.pet-button');
@@ -7,12 +8,17 @@ const text = pet.querySelector('.pet-dialogue-text');
 const announcement = pet.querySelector('.pet-announcement');
 const dismiss = pet.querySelector('.pet-dismiss');
 const home = pet.parentElement;
+const sprite = pet.querySelector('.pet-sprite');
+const frames = new Map([...sprite.querySelectorAll('[data-frame]')].map((frame) => [frame.dataset.frame, frame]));
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const idleDelay = 30_000;
 const photoWindow = 45_000;
 const photoCooldown = 60_000;
 const historyKey = 'photowall-pet-photo-views';
 
 let poseTimer;
+let motion;
+let currentFrame = frames.get('rest');
 let dialogueTimer;
 let idleTimer;
 let followUp;
@@ -31,9 +37,31 @@ try {
   // Counting still works within the current page if storage is blocked.
 }
 
+function setPose(pose) {
+  const nextFrame = frames.get(pose);
+  if (nextFrame !== currentFrame) {
+    currentFrame.classList.remove('is-current');
+    nextFrame.classList.add('is-current');
+    currentFrame = nextFrame;
+  }
+  pet.dataset.pose = pose;
+  const from = motion ? getComputedStyle(sprite).transform : 'none';
+  motion?.cancel();
+  motion = undefined;
+  const action = petMotion[pose];
+  if (!reducedMotion.matches && (action || from !== 'none')) {
+    motion = sprite.animate([
+      { offset: 0, transform: from, easing: 'ease-in-out' },
+      ...(action?.frames ?? []),
+      settledFrame,
+    ], { duration: action?.duration ?? 185 });
+  }
+  return action?.duration ?? 0;
+}
+
 function resetPose() {
   clearTimeout(poseTimer);
-  pet.dataset.pose = 'rest';
+  setPose('rest');
 }
 
 function hideDialogue() {
@@ -52,13 +80,13 @@ function hideDialogue() {
 function speak(line) {
   clearTimeout(poseTimer);
   clearTimeout(dialogueTimer);
-  pet.dataset.pose = line.pose;
+  const duration = setPose(line.pose);
   pet.dataset.speaking = 'true';
   followUp = line.followUp;
   text.textContent = line.text;
   dialogue.hidden = false;
   announcement.textContent = line.text;
-  poseTimer = setTimeout(resetPose, line.pose === 'doze' ? 2800 : 1550);
+  poseTimer = setTimeout(resetPose, duration + 160);
   dialogueTimer = setTimeout(hideDialogue, Math.max(7000, line.text.length * 145));
 }
 
@@ -101,6 +129,11 @@ for (const type of ['pointerdown', 'pointermove', 'keydown', 'scroll', 'wheel'])
 }
 window.addEventListener('pageshow', scheduleIdle);
 document.addEventListener('visibilitychange', scheduleIdle);
+reducedMotion.addEventListener('change', (event) => {
+  if (!event.matches) return;
+  motion?.cancel();
+  motion = undefined;
+});
 
 document.addEventListener('photowall:viewer-open', (event) => event.detail.append(pet));
 document.addEventListener('photowall:viewer-close', () => home.append(pet));
@@ -127,7 +160,7 @@ const preload = (name) => {
   return image.decode();
 };
 
-Promise.all([preload('./pet-poses.webp'), preload('./pet-scenes.webp')]).then(() => {
+Promise.all([preload('./pet-poses-hd.webp'), preload('./pet-scenes-hd.webp')]).then(() => {
   pet.hidden = false;
   scheduleIdle();
 }).catch(() => {

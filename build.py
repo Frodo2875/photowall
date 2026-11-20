@@ -82,7 +82,16 @@ def page(title, current, prefix, content, head="", script=""):
     </div>
     <span class="sr-only pet-announcement" role="status" aria-atomic="true"></span>
     <button type="button" class="pet-button" aria-label="蓝鲸少女，点击互动">
-      <span class="pet-sprite" aria-hidden="true"></span>
+      <span class="pet-sprite" aria-hidden="true">
+        <span class="pet-frame is-current" data-frame="rest"><span class="pet-blink"></span></span>
+        <span class="pet-frame" data-frame="wave"></span>
+        <span class="pet-frame" data-frame="cheer"></span>
+        <span class="pet-frame" data-frame="heart"></span>
+        <span class="pet-frame" data-frame="think"></span>
+        <span class="pet-frame" data-frame="detective"></span>
+        <span class="pet-frame" data-frame="doze"></span>
+        <span class="pet-frame" data-frame="trophy"></span>
+      </span>
       <span class="pet-bubbles" aria-hidden="true"><i></i><i></i><i></i><b>!</b></span>
     </button>
   </div>

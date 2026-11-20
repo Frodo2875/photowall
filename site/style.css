@@ -378,27 +378,50 @@ h1 {
 .pet-dismiss:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
 .pswp .pet-button:focus-visible { outline-color: #fff; outline-offset: -2px; }
 .pet-sprite {
+  position: relative;
   display: block;
   width: 100%;
   height: 100%;
-  background: url("pet-poses.webp") 0 0 / 600% 100% no-repeat;
   pointer-events: none;
-  transform-origin: 50% 92%;
-  filter: drop-shadow(0 3px 4px rgb(14 25 45 / 26%));
+  transform-origin: 50% 96%;
 }
-[data-pose="wave"] .pet-sprite { background-position-x: 20%; animation: pet-wave .62s ease-in-out 2; }
-[data-pose="cheer"] .pet-sprite { background-position-x: 40%; animation: pet-hop .52s ease-in-out 2; }
-[data-pose="heart"] .pet-sprite { background-position-x: 60%; animation: pet-heart .65s ease 2; }
-[data-pose="think"] .pet-sprite { background-position-x: 80%; animation: pet-think 1.45s ease-in-out; }
-[data-pose="detective"] .pet-sprite,
-[data-pose="doze"] .pet-sprite,
-[data-pose="trophy"] .pet-sprite {
-  background-image: url("pet-scenes.webp");
+.pet-frame, .pet-blink {
+  position: absolute;
+  inset: 0;
+  background: url("pet-poses-hd.webp") 0 0 / 600% 100% no-repeat;
+  opacity: 0;
+}
+.pet-frame {
+  filter: drop-shadow(0 3px 4px rgb(14 25 45 / 22%));
+  visibility: hidden;
+  transition: opacity 150ms ease-in-out, visibility 0s linear 150ms;
+}
+.pet-frame.is-current { opacity: 1; visibility: visible; transition-delay: 0s; }
+.pet-frame[data-frame="rest"] { transform-origin: 50% 96%; }
+.pet-frame[data-frame="rest"].is-current { animation: pet-breathe 4.6s ease-in-out infinite; }
+.pet-blink {
+  background-position-x: 100%;
+  opacity: 1;
+  visibility: hidden;
+}
+.pet-frame.is-current .pet-blink { animation: pet-blink 7s steps(1, end) infinite; }
+[data-frame="wave"] { background-position-x: 20%; }
+[data-frame="cheer"] { background-position-x: 40%; }
+[data-frame="heart"] { background-position-x: 60%; }
+[data-frame="think"] { background-position-x: 80%; }
+[data-frame="detective"], [data-frame="doze"], [data-frame="trophy"] {
+  background-image: url("pet-scenes-hd.webp");
   background-size: 300% 100%;
 }
-[data-pose="detective"] .pet-sprite { animation: pet-peek .72s ease-out; }
-[data-pose="doze"] .pet-sprite { background-position-x: 50%; animation: pet-nap 1.3s ease-in-out 2; }
-[data-pose="trophy"] .pet-sprite { background-position-x: 100%; animation: pet-hop .65s ease-in-out 2; }
+[data-frame="doze"] { background-position-x: 50%; }
+[data-frame="trophy"] { background-position-x: 100%; }
+@keyframes pet-breathe {
+  50% { transform: scale(1.007, 1.016); }
+}
+@keyframes pet-blink {
+  49%, 100% { visibility: hidden; }
+  47% { visibility: visible; }
+}
 .pet-bubbles { display: none; pointer-events: none; }
 [data-pose="doze"] .pet-bubbles { display: block; }
 .pet-bubbles i, .pet-bubbles b { position: absolute; opacity: 0; }
@@ -432,29 +455,9 @@ h1 {
 @keyframes pet-notice {
   15%, 85% { opacity: 1; }
 }
-@keyframes pet-peek {
-  from { transform: translateY(23%); opacity: 0; }
-}
-@keyframes pet-wave {
-  25% { transform: rotate(-7deg); }
-  75% { transform: rotate(5deg); }
-}
-@keyframes pet-hop {
-  26% { transform: translateY(-15%) scale(.98, 1.04); }
-  63% { transform: scale(1.06, .94); }
-}
-@keyframes pet-heart {
-  50% { transform: scale(1.075); }
-}
-@keyframes pet-think {
-  24%, 75% { transform: rotate(-5deg); }
-  52% { transform: rotate(4deg); }
-}
-@keyframes pet-nap {
-  50% { transform: scale(1.025, .965); }
-}
 @media (prefers-reduced-motion: reduce) {
-  .photowall-pet[data-pose] .pet-sprite, .pet-bubbles :is(i, b) { animation: none; }
+  .pet-frame, .pet-frame[data-frame="rest"].is-current { animation: none; transition: none; }
+  .pet-frame.is-current .pet-blink, .pet-bubbles :is(i, b) { animation: none; }
   .pet-bubbles b { opacity: 1; }
 }
 @media (max-width: 600px) {
