@@ -87,7 +87,8 @@ function speak(line) {
   dialogue.hidden = false;
   announcement.textContent = line.text;
   poseTimer = setTimeout(resetPose, duration + 160);
-  dialogueTimer = setTimeout(hideDialogue, Math.max(7000, line.text.length * 145));
+  const readingTime = Math.min(12_000, Math.max(6000, 3800 + line.text.length * 130));
+  dialogueTimer = setTimeout(hideDialogue, readingTime);
 }
 
 function takeClickLine() {

@@ -336,28 +336,44 @@ h1 {
 }
 .pswp .photowall-pet:not([data-speaking]) { visibility: hidden; }
 .pet-dialogue {
+  --bubble-top: #f8fcff;
+  --bubble-bottom: #e5f2ff;
+  --bubble-edge: #476b9d;
   position: absolute;
   right: 0;
-  bottom: calc(100% + .4rem);
+  bottom: calc(100% + .75rem);
   width: min(23rem, calc(100vw - 1.5rem - env(safe-area-inset-left) - env(safe-area-inset-right)));
-  max-height: 42dvh;
-  overflow: auto;
-  padding: .85rem 3.15rem .85rem 1rem;
-  border: 2px solid #546681;
-  border-radius: .8rem;
-  background: #fff;
-  color: #162239;
-  box-shadow: 0 .3rem 1.2rem rgb(0 0 0 / 19%);
+  padding: .95rem 3.15rem .95rem 1.1rem;
+  border: 2px solid var(--bubble-edge);
+  border-radius: 1.5rem 1.5rem .95rem 1.5rem;
+  background: linear-gradient(var(--bubble-top), var(--bubble-bottom));
+  color: #132641;
+  box-shadow: 0 .3rem 1rem rgb(29 70 122 / 18%);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.65;
   overflow-wrap: anywhere;
   pointer-events: auto;
 }
+.pet-dialogue::after {
+  content: "";
+  position: absolute;
+  right: clamp(3rem, 5vw, 6rem);
+  bottom: -.48rem;
+  width: .85rem;
+  height: .85rem;
+  border-right: 2px solid var(--bubble-edge);
+  border-bottom: 2px solid var(--bubble-edge);
+  border-bottom-right-radius: .22rem;
+  background: var(--bubble-bottom);
+  transform: rotate(45deg);
+}
+.pet-dialogue-text { max-height: 38dvh; overflow: auto; }
 [data-theme="dark"] .pet-dialogue {
-  background: #13243c;
+  --bubble-top: #172e4e;
+  --bubble-bottom: #10233e;
+  --bubble-edge: #9fc9ff;
   color: #f1f5ff;
-  border-color: #a0b6d9;
 }
 .pet-dismiss {
   position: absolute;
@@ -368,13 +384,13 @@ h1 {
   width: 2.75rem;
   height: 2.75rem;
   border: 0;
-  border-radius: .5rem;
+  border-radius: 50%;
   background: transparent;
   color: inherit;
   font-size: 1.55rem;
   cursor: pointer;
 }
-.pet-dismiss:hover { background: var(--mute); }
+.pet-dismiss:hover { background: var(--bubble-bottom); }
 .pet-dismiss:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
 .pswp .pet-button:focus-visible { outline-color: #fff; outline-offset: -2px; }
 .pet-sprite {
