@@ -330,6 +330,17 @@ h1 {
   pointer-events: auto;
 }
 .pet-button, .pet-dismiss { -webkit-tap-highlight-color: transparent; }
+.pet-button.can-turn { cursor: grab; touch-action: pan-y; }
+.pet-button.is-turning { cursor: grabbing; }
+.pet-turn, .pet-turn span {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.pet-turn { visibility: hidden; filter: drop-shadow(0 3px 4px rgb(14 25 45 / 22%)); }
+.pet-turn span { background: url("pet-turns.webp") 0 0 / 800% 100% no-repeat; }
+.pet-button.is-turned .pet-turn { visibility: visible; }
+.pet-button.is-turned .pet-sprite { opacity: 0; }
 .pswp .photowall-pet {
   position: absolute;
   bottom: max(3.75rem, calc(env(safe-area-inset-bottom) + 3rem));

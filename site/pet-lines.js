@@ -5,6 +5,10 @@ export const clickLines = [
   { pose: 'heart', text: '谁把本鲸画地为牢了？怎么满屏都是舍不得删的照片。' },
   { pose: 'cheer', text: '嘴上说再翻一张，手已经划出去八百里了呢。' },
   { pose: 'wave', text: '这波回忆杀，建议直接给摄影师颁个 MVP。🐳' },
+  { pose: 'think', text: '1991 年张大爷的老梗都返场了，本鲸翻到一张旧照，怎么就叫考古了？' },
+  { pose: 'cheer', text: '厉娜出场帅晕我，这张出片也一样。本鲸申请把相册封面给它焊死！' },
+  { pose: 'trophy', text: '远点一穿二？本鲸站在右下角，一眼就被两张照片击中。' },
+  { pose: 'heart', text: '蓝溪镇都要动画化了，这组日常能不能也拍一季？本鲸先预约片尾彩蛋。' },
 ];
 
 export const rapidClickLine = {

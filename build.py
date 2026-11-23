@@ -14,7 +14,9 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent
 STYLE_VERSION = sha256((ROOT / "site/style.css").read_bytes()).hexdigest()[:12]
-PET_VERSION = sha256((ROOT / "site/pet.js").read_bytes()).hexdigest()[:12]
+PET_VERSION = sha256(b"".join(
+    (ROOT / "site" / name).read_bytes() for name in ("pet.js", "pet-lines.js", "pet-turn.js")
+)).hexdigest()[:12]
 GALLERY_VERSION = sha256((ROOT / "site/gallery.js").read_bytes()).hexdigest()[:12]
 BLOG = "https://frodo2875.github.io/xinghao.github.io/"
 PHOTOWALL_LAUNCHED = date(2026, 11, 19)

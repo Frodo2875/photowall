@@ -1,5 +1,7 @@
-import { browsingLine, clickLines, idleLine, rapidClickLine } from './pet-lines.js';
 import { petMotion, settledFrame } from './pet-motion.js';
+
+const revision = new URL(import.meta.url).search;
+const { browsingLine, clickLines, idleLine, rapidClickLine } = await import('./pet-lines.js' + revision);
 
 const pet = document.querySelector('.photowall-pet');
 const button = pet.querySelector('.pet-button');
@@ -28,6 +30,7 @@ let lastTap = -Infinity;
 let taps = 0;
 let photos = [];
 let lastBrowse = 0;
+let turn;
 
 try {
   const history = JSON.parse(sessionStorage.getItem(historyKey));
@@ -107,7 +110,8 @@ function scheduleIdle() {
   }
 }
 
-button.addEventListener('click', () => {
+button.addEventListener('click', (event) => {
+  if (turn && !turn.acceptClick(event)) return;
   const now = performance.now();
   taps = now - lastTap <= 2000 ? taps + 1 : 1;
   lastTap = now;
@@ -164,6 +168,10 @@ const preload = (name) => {
 Promise.all([preload('./pet-poses-hd.webp'), preload('./pet-scenes-hd.webp')]).then(() => {
   pet.hidden = false;
   scheduleIdle();
+  return Promise.all([preload('./pet-turns.webp'), import('./pet-turn.js' + revision)]).then(([, { enablePetTurn }]) => {
+    turn = enablePetTurn(button, reducedMotion);
+    button.setAttribute('aria-label', '蓝鲸少女，点击互动，左右拖动或按方向键转身');
+  });
 }).catch(() => {
-  // Leave the companion hidden if its artwork cannot load.
+  // An unavailable turnaround sheet should not prevent basic interaction.
 });
