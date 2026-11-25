@@ -20,7 +20,7 @@ PET_VERSION = sha256(b"".join(
 GALLERY_VERSION = sha256((ROOT / "site/gallery.js").read_bytes()).hexdigest()[:12]
 BLOG = "https://frodo2875.github.io/xinghao.github.io/"
 PHOTOWALL_LAUNCHED = date(2026, 11, 19)
-CATEGORIES = {"travel": "旅行", "daily": "日常", "people": "人物", "events": "活动"}
+CATEGORIES = {"travel": "旅行", "daily": "日常", "people": "人物", "events": "活动", "plants": "植物"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
 
@@ -31,6 +31,7 @@ class Photo:
     height: int
     alt: str
     caption: str
+    description: str
 
 
 @dataclass
@@ -130,6 +131,7 @@ def build_album(manifest, output):
         raise ValueError(f"{manifest}: 相册里至少放一张 JPG、PNG 或 WebP。")
     cover_name = data.get("cover", images[0].name)
     captions = data.get("captions", {})
+    descriptions = data.get("photo_descriptions", {})
     if cover_name not in {photo.name for photo in images}:
         raise ValueError(f"{manifest}: 找不到封面 {cover_name}。")
 
@@ -149,7 +151,8 @@ def build_album(manifest, output):
             image.paste(normalized)
             width, height = save_image(image, photo_dir / f"{number}.webp", 2000, 84)
             save_image(image, photo_dir / f"{number}-thumb.webp", 760, 79)
-        photos.append(Photo(number, width, height, caption or f"{title}，第 {number} 张", caption))
+        photos.append(Photo(number, width, height, caption or f"{title}，第 {number} 张",
+                            caption, descriptions.get(image_path.name, "")))
     cover = photos[[path.name for path in images].index(cover_name)]
     return Album(slug, title, captured, category, data.get("description", ""), cover, photos)
 
@@ -217,7 +220,7 @@ def album_page(album, demo):
         items.append(f"""
       <a href="{path}.webp" class="photo" style="--ratio: {ratio:.6f}"
          data-pswp-width="{photo.width}" data-pswp-height="{photo.height}"
-         data-caption="{escape(photo.caption)}">
+         data-caption="{escape(photo.caption)}" data-description="{escape(photo.description)}">
         <img src="{path}-thumb.webp" alt="{escape(photo.alt)}"
              width="{photo.width}" height="{photo.height}" {loading}>
       </a>""")

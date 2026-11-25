@@ -80,8 +80,65 @@ lightbox.on('uiRegister', () => {
     className: 'photo-caption',
     appendTo: 'root',
     onInit: (element) => {
+      const caption = document.createElement('span');
+      const info = document.createElement('button');
+      info.type = 'button';
+      info.hidden = true;
+      info.className = 'photo-info';
+      info.textContent = 'ⓘ';
+      info.setAttribute('aria-label', '植物简介');
+      info.setAttribute('aria-expanded', 'false');
+      info.setAttribute('aria-describedby', 'photo-info-tooltip');
+      const detail = document.createElement('span');
+      detail.id = 'photo-info-tooltip';
+      detail.className = 'photo-info-tooltip';
+      detail.setAttribute('role', 'tooltip');
+      element.append(caption, info, detail);
+
+      let pinned = false;
+      let closeTimer;
+      function show(visible) {
+        clearTimeout(closeTimer);
+        detail.classList.toggle('is-visible', visible);
+        info.setAttribute('aria-expanded', String(visible));
+      }
+      function closeSoon() {
+        clearTimeout(closeTimer);
+        if (!pinned && !info.matches(':focus-visible')) {
+          closeTimer = setTimeout(() => show(false), 220);
+        }
+      }
+      info.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'mouse') show(true);
+      });
+      info.addEventListener('pointerleave', closeSoon);
+      detail.addEventListener('pointerenter', () => clearTimeout(closeTimer));
+      detail.addEventListener('pointerleave', closeSoon);
+      info.addEventListener('focus', () => {
+        if (info.matches(':focus-visible')) show(true);
+      });
+      info.addEventListener('blur', () => { pinned = false; show(false); });
+      info.addEventListener('click', () => { pinned = !pinned; show(pinned); });
+      info.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && detail.classList.contains('is-visible')) {
+          event.stopPropagation();
+          pinned = false;
+          show(false);
+        }
+      });
+      viewer.element.addEventListener('pointerdown', (event) => {
+        if (event.target === info || detail.contains(event.target)) return;
+        pinned = false;
+        show(false);
+      });
+      viewer.on('destroy', () => clearTimeout(closeTimer));
       viewer.on('change', () => {
-        element.textContent = viewer.currSlide.data.element?.dataset.caption || '';
+        const data = viewer.currSlide.data.element?.dataset;
+        caption.textContent = data?.caption || '';
+        detail.textContent = data?.description || '';
+        info.hidden = !detail.textContent;
+        pinned = false;
+        show(false);
       });
     },
   });

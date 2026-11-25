@@ -203,14 +203,47 @@ h1 {
 .pswp .photo-caption {
   position: absolute;
   z-index: 10;
-  inset: auto 1rem .85rem;
-  max-height: 3.15rem;
-  overflow: auto;
+  inset: auto 1rem .4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .2rem;
+  min-height: 2.75rem;
+  pointer-events: none;
   color: #fff;
   text-align: center;
   font-size: .875rem;
   line-height: 1.5;
 }
+.pswp .photo-info {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #dbeafe;
+  font-size: 1.15rem;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.pswp .photo-info:focus-visible { outline: 2px solid #dbeafe; outline-offset: -4px; }
+.pswp .photo-info-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: max-content;
+  max-width: min(19rem, 100%);
+  padding: .45rem .65rem;
+  border: 1px solid #9fb6d6;
+  border-radius: .5rem;
+  background: #15243b;
+  color: #f5f9ff;
+  transform: translateX(-50%);
+  visibility: hidden;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.pswp .photo-info-tooltip.is-visible { visibility: visible; pointer-events: auto; }
 .about {
   --profile-surface: color-mix(in srgb, var(--mute) 55%, var(--paper));
   --profile-banner: linear-gradient(115deg, var(--mute), var(--paper) 85%);
